@@ -1,5 +1,0 @@
-module.exports = {
-  token: 'token',
-  amounts: [5, 30, 180, 500] // list of amounts available (in seconds)
-}
-
