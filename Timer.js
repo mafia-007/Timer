@@ -55,7 +55,7 @@ bot.onText(/\/start/, function (msg) {
   if (msg.chat.type != 'private') return;
 
   var fromId = msg.from.id;
-  var resp = `Hello!\nI work in inline mode, that means that you just need to write @${bot.time} followed by your message, then wait a moment for the options to show up.\nSelect the amount of time desired and you're done! ;)\n\n channel >> @xtria`;
+  var resp = `Hello!\nI work in inline mode, that means that you just need to write @${%%} followed by your message, then wait a moment for the options to show up.\nSelect the amount of time desired and you're done! ;)\n\n channel >> @xtria`;
   bot.sendMessage(fromId, resp);
 });
 
