@@ -8,7 +8,7 @@ var bot = new TelegramBot(config.token, {polling: {timeout: 1, interval: 100}});
 var timeouts = {};
 
 function build_inline_result (timeout, msg) {
-  var btn = {inline_keyboard: [[{text: 'Timer', callback_data: `${timeout}`}]]}
+  var btn = {inline_keyboard: [[{text: 'Timer', callback_data: ${timeout}}]]}
   var result_text = {message_text: msg.query}
   var result = {
     type: 'article',
@@ -30,15 +30,14 @@ bot.on('callback_query', function (call) {
   if (!(call.inline_message_id in timeouts)) {
     bot.answerCallbackQuery(call.id, 'An error occured.', true);
   }
-  bot.answerCallbackQuery(call.id, `Timer set >> ${call.data} seconds.\n${Math.floor(timeouts[call.inline_message_id].getTimeLeft() / 1000)} seconds remaining.`, true)
-});
+  bot.answerCallbackQuery(call.id, `Timer set >> ${call.data} seconds.
 
 bot.on('inline_query', function (query) {
-  if (query.query == '') {
-    bot.answerInlineQuery(query.id, []);
+  if (query.query == 'ok') {
+    bot.answerInlineQuery(query.id, [info]);
     return;
   }
-  var results = [];
+  var results = [time];
   for (var i in config.amounts)
     results.push( build_inline_result(config.amounts[i], query) );
 
