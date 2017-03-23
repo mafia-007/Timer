@@ -8,7 +8,7 @@ var bot = new TelegramBot(config.token, {polling: {timeout: 1, interval: 100}});
 var timeouts = {};
 
 function build_inline_result (timeout, msg) {
-  var btn = {inline_keyboard: [[{text: 'Timer', callback_data: ${timeout}}]]}
+  var btn = {inline_keyboard: [[{text: 'Timer', callback_data: ${timeout;}}]]}
   var result_text = {message_text: msg.query}
   var result = {
     type: 'article',
@@ -30,11 +30,11 @@ bot.on('callback_query', function (call) {
   if (!(call.inline_message_id in timeouts)) {
     bot.answerCallbackQuery(call.id, 'An error occured.', true);
   }
-  bot.answerCallbackQuery(call.id, `Timer set >> ${call.data} seconds.
+  bot.answerCallbackQuery(call.id, `Timer set >> ${call.data} seconds.}}
 
 bot.on('inline_query', function (query) {
-  if (query.query == 'ok') {
-    bot.answerInlineQuery(query.id, [info]);
+  if (query.query == 'launch') {
+    bot.answerInlineQuery(query.id, [time]);
     return;
   }
   var results = [time];
@@ -55,7 +55,7 @@ bot.onText(/\/start/, function (msg) {
   if (msg.chat.type != 'private') return;
 
   var fromId = msg.from.id;
-  var resp = `Hello!\nI work in inline mode, that means that you just need to write @${bot.username} followed by your message, then wait a moment for the options to show up.\nSelect the amount of time desired and you're done! ;)\n\n channel >> @xtria`;
+  var resp = `Hello!\nI work in inline mode, that means that you just need to write @${bot.time} followed by your message, then wait a moment for the options to show up.\nSelect the amount of time desired and you're done! ;)\n\n channel >> @xtria`;
   bot.sendMessage(fromId, resp);
 });
 
