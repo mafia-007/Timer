@@ -2,7 +2,7 @@ function()
           return remaining
       }
 
-      this.getStateRunning = function() {
+      getStateRunning = function() {
           return running
       }
 
