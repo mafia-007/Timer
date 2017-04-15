@@ -7,48 +7,8 @@ use Encode ();
 use JSON::MaybeXS ();
 use constant DEBUG => $ENV{TELEGRAM_BOTAPI_DEBUG} || 0;
 
-our $VERSION = "0.08";
-my $json; # for debugging purposes, only defined when DEBUG = 1
 
-BEGIN {
-    eval "require Mojo::UserAgent; 1" or
-        eval "require LWP::UserAgent; 1" or
-        die "Either Mojo::UserAgent or LWP::UserAgent is required.\n$@";
-    $json = JSON::MaybeXS->new (pretty => 1, utf8 => 1) if DEBUG;
-}
-
-# Debugging functions (only used when DEBUG is true)
-sub _dprintf { printf "-T- $_[0]\n", splice @_, 1 }
-sub _ddump
-{
-    my ($varname, $to_dump) = splice @_, -2;
-    _dprintf @_ if @_;
-    printf "%s = %s", $varname, $json->encode ($to_dump);
-}
-
-# %settings = (
-#     async     => Bool,
-#     token     => String,
-#     api_url   => "http://something/%s/%s", # 1st %s = tok, 2nd %s = method
-#     force_lwp => Bool
-# )
-sub new
-{
-    my ($class, %settings) = @_;
-    exists $settings{token}
-        or Carp::croak "ERROR: missing 'token' from \%settings.";
-    # When DEBUG is enabled, and Mojo::UserAgent is used, Mojolicious must be at
-    # least version 6.22 (https://github.com/kraih/mojo/blob/v6.22/Changes). This is because
-    # Mojo::JSON used incompatible JSON boolean constants which led JSON::MaybeXS to crash
-    # with a mysterious error message. To prevent this, we force LWP in this case.
-    if (DEBUG && Mojo::JSON->can ("true") && ref Mojo::JSON->true ne "JSON::PP::Boolean")
-    {
-        warnings::warnif (
-            "WARNING: Enabling DEBUG with Mojolicious versions < 6.22 won't work. Forcing " .
-            "LWP::UserAgent. (update Mojolicious or disable DEBUG to fix)"
-        );
-        ++$settings{force_lwp};
-    }
+      
     # Ensure that LWP is loaded if "force_lwp" is specified.
     $settings{force_lwp}
         and require LWP::UserAgent;
@@ -475,33 +435,3 @@ L<LWP::UserAgent> or L<Mojo::UserAgent> by using C<isa>:
     my $is_lwp = $user_agent->isa ('LWP::UserAgent');
 =head1 DEBUGGING
 To perform some cool troubleshooting, you can set the environment variable C<TELEGRAM_BOTAPI_DEBUG>
-to a true value:
-    TELEGRAM_BOTAPI_DEBUG=1 perl script.pl
-This dumps the content of each request and response in a friendly, human-readable way.
-It also prints the version and the configuration of the module. As a security measure, the bot's
-token is automatically removed from the output of the dump.
-B<WARNING:> using this option along with an old Mojolicious version (< 6.22) leads to a warning,
-and forces L<LWP::UserAgent> instead of L<Mojo::UserAgent>. This is because L<Mojo::JSON>
-used incompatible boolean values up to version 6.21, which led to an horrible death of
-L<JSON::MaybeXS> when serializing the data.
-=head1 CAVEATS
-When asynchronous mode is enabled, no error handling is performed. You have to do it by
-yourself as shown in the L</"SYNOPSIS">.
-=head1 SEE ALSO
-L<LWP::UserAgent>, L<Mojo::UserAgent>,
-L<https://core.telegram.org/bots/api>, L<https://core.telegram.org/bots>,
-L<example implementation of a Telegram bot|https://git.io/vlOK0>,
-L<example implementation of an async Telegram bot|https://git.io/vDrwL>
-=head1 AUTHOR
-Roberto Frenna (robertof AT cpan DOT org)
-=head1 BUGS
-Please report any bugs or feature requests to
-
-=head1 THANKS
-Thanks to L<the authors of Mojolicious|Mojolicious> for inspiration about the license and the
-documentation.
-=head1 LICENSE
-Copyright (C) 2015, Roberto Frenna.
-This program is free software, you can redistribute it and/or modify it under the terms of the
-Artistic License version 2.0.
-=cut
